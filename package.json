@@ -10,8 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^8.17.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "sqlite3": "^5.1.7"
+    "express-rate-limit": "^7.5.0",
+    "pm2": "^6.0.6",
+    "redis": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.1.0"
   }
 }

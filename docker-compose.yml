@@ -5,9 +5,8 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - .:/app
+      - ./data:/app/data
     working_dir: /app
-    command: ['pm2-runtime', 'ecosystem.config.js']
     environment:
       - NODE_ENV=production
     depends_on:
