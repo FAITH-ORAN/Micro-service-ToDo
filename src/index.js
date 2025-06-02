@@ -10,7 +10,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-initDB();
+initTelemetry()
+
+initDB()
 
 // app.use(
 //   compression({
@@ -19,14 +21,16 @@ initDB();
 // );
 app.use(express.json());
 
-// const limiter = rateLimit({
-//   windowMs: 1 * 60 * 1000,
-//   max: 100,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: { error: 'Too many requests, please try again later.' },
-// });
-// app.use(limiter);
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` standardHeaders
+  lengacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many requests, please try again later.',
+  },
+})
+app.use(limiter)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Hello, World!' });
