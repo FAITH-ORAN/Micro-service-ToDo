@@ -11,6 +11,15 @@ services:
       - NODE_ENV=production
     depends_on:
       - redis
+
+  worker:
+    build: .
+    command: node queue/worker.js
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+
   redis:
     image: redis:alpine
     ports:

@@ -20,6 +20,8 @@ initDB()
 //   })
 // );
 app.use(express.json());
+app.use(express.json())
+app.use(rateLimiter)
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute

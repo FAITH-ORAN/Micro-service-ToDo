@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "worker": "node src/queue/worker.js"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +18,12 @@
     "@opentelemetry/resources": "^2.0.1",
     "@opentelemetry/sdk-node": "^0.201.1",
     "ajv": "^8.17.1",
+    "bullmq": "^5.53.1",
     "compression": "^1.8.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
+    "ioredis": "^5.6.1",
     "pm2": "^6.0.6",
     "redis": "^5.1.1",
     "sqlite3": "^5.1.7",

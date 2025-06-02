@@ -1,7 +1,5 @@
-const Ajv = require('ajv')
-const { v4: uuidv4 } = require('uuid')
 const redisClient = require('../redis')
-
+const todoQueue = require('../../queue/queue')
 const model = require('../models/todo.model')
 const todoSchema = require('../../schemas/todo.schema')
 const updateTodoSchema = require('../../schemas/update-todo.schema')
@@ -12,20 +10,19 @@ const validateUpdate = ajv.compile(updateTodoSchema)
 const { insertTodoWithRetry } = require('../models/todo.model');
 
 async function createTodo(req, res) {
-  const idempotencyKey = req.headers['x-idempotency-key']
   const { title } = req.body
+  const idempotencyKey = req.idempotencyKey
 
-  const isValid = validateCreate(req.body)
-  if (!isValid) {
-    return res
-      .status(400)
-      .json({ error: 'Invalid data', details: validateCreate.errors })
-  }
+  const job = await todoQueue.add('createTodo', { title })
 
-  if (!idempotencyKey) {
-    return res.status(400).json({ error: 'Idempotency key is required' })
-  }
+  const tempResponse = { jobId: job.id, status: 'queued' }
+  await redisClient.set(
+    `idem:${idempotencyKey}`,
+    JSON.stringify(tempResponse),
+    { EX: 60 * 60 * 24 }
+  )
 
+  res.status(202).json(tempResponse)
   const cached = await redisClient.get(`idem:${idempotencyKey}`)
   if (cached) {
     return res.status(200).json(JSON.parse(cached))
@@ -56,12 +53,6 @@ function getAllTodos(req, res) {
 }
 
 function updateTodo(req, res) {
-  const isValid = validateUpdate(req.body)
-  if (!isValid) {
-    return res
-      .status(400)
-      .json({ error: 'Invalid data', details: validateUpdate.errors })
-  }
   const { id } = req.params
   const { completed } = req.body
 
