@@ -2,7 +2,7 @@
 
 - Make sure that your app is running
 
-## Performance Measurements with K6
+## Load Testing with k6
 
 . To run the tests
 
