@@ -9,6 +9,7 @@ const updateTodoSchema = require('../../schemas/update-todo.schema')
 const ajv = new Ajv()
 const validateCreate = ajv.compile(todoSchema)
 const validateUpdate = ajv.compile(updateTodoSchema)
+const { insertTodoWithRetry } = require('../models/todo.model');
 
 async function createTodo(req, res) {
   const idempotencyKey = req.headers['x-idempotency-key']
@@ -30,17 +31,19 @@ async function createTodo(req, res) {
     return res.status(200).json(JSON.parse(cached))
   }
 
-  model.insertTodo(title, async (err, todo) => {
+  // Use the retry helper defined in your model
+  insertTodoWithRetry(title, 0, async (err, todo) => {
     if (err) {
-      return res.status(500).json({ error: 'Failed to create todo' })
+      return res.status(500).json({ error: 'Failed to create todo' });
     }
+    // Cache the response in Redis for 24h
     await redisClient.set(
       `idem:${idempotencyKey}`,
       JSON.stringify(todo),
-      { EX: 60 * 60 * 24 } // Cache for 24 hour
-    )
-    res.status(201).json(todo)
-  })
+      { EX: 60 * 60 * 24 }
+    );
+    res.status(201).json(todo);
+  });
 }
 
 function getAllTodos(req, res) {
