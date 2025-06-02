@@ -110,3 +110,21 @@ Micro-service-ToDo/
 │   └── load.test.js
 └── package.json
 ```
+
+## Note: to test HTTP Compression (Gzip) works correctly
+
+- Verify with curl
+
+  ```
+    curl -H "Accept-Encoding: gzip" -I http://localhost:3000/api/todos
+  ```
+
+- you should see:
+
+```
+  HTTP/1.1 200 OK
+  Content-Encoding: gzip
+  Vary: Accept-Encoding
+```
+
+    •	The Content-Encoding: gzip header confirms responses are compressed.
