@@ -1,13 +1,8 @@
 const redisClient = require('../redis')
 const todoQueue = require('../../queue/queue')
 const model = require('../models/todo.model')
-const todoSchema = require('../../schemas/todo.schema')
-const updateTodoSchema = require('../../schemas/update-todo.schema')
 
-const ajv = new Ajv()
-const validateCreate = ajv.compile(todoSchema)
-const validateUpdate = ajv.compile(updateTodoSchema)
-const { insertTodoWithRetry } = require('../models/todo.model');
+//const { insertTodoWithRetry } = require('../models/todo.model');
 
 async function createTodo(req, res) {
   const { title } = req.body
@@ -29,18 +24,16 @@ async function createTodo(req, res) {
   }
 
   // Use the retry helper defined in your model
-  insertTodoWithRetry(title, 0, async (err, todo) => {
+  model.insertTodoWithRetry(title, 0, async (err, todo) => {
     if (err) {
-      return res.status(500).json({ error: 'Failed to create todo' });
+      return res.status(500).json({ error: 'Failed to create todo' })
     }
     // Cache the response in Redis for 24h
-    await redisClient.set(
-      `idem:${idempotencyKey}`,
-      JSON.stringify(todo),
-      { EX: 60 * 60 * 24 }
-    );
-    res.status(201).json(todo);
-  });
+    await redisClient.set(`idem:${idempotencyKey}`, JSON.stringify(todo), {
+      EX: 60 * 60 * 24,
+    })
+    res.status(201).json(todo)
+  })
 }
 
 function getAllTodos(req, res) {

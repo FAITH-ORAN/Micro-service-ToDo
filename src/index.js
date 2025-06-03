@@ -20,7 +20,7 @@ initDB()
 //     threshold: 0, // compress every JSON response, no matter how small
 //   })
 // );
-app.use(express.json());
+
 app.use(express.json())
 app.use(rateLimiter)
 app.use(metricsMiddleware)
