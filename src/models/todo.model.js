@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose()
 const path = require('path')
 const dbPath = path.join(__dirname, '../../data/todos.db')
+const logger = require('../logger');
 
 // src/models/todo.model.js
 const db = require('../db/knex')
