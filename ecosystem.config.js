@@ -7,7 +7,7 @@ module.exports = {
       exec_mode: 'cluster',
       merge_logs: true,
       env: {
-        NODE_ENV: 'production',
+        NODE_ENV: 'staging',
       },
     },
   ],
