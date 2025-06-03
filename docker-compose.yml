@@ -11,7 +11,38 @@ services:
       - NODE_ENV=production
     depends_on:
       - redis
+
+  worker:
+    build: .
+    command: node queue/worker.js
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+
   redis:
     image: redis:alpine
     ports:
       - '6379:6379'
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    ports:
+      - '16686:16686'
+      - '4318:4318'
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3001:3000'
+    volumes:
+      - ./grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
