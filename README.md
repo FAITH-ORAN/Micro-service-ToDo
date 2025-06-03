@@ -128,3 +128,7 @@ Micro-service-ToDo/
 ```
 
     •	The Content-Encoding: gzip header confirms responses are compressed.
+
+# Winston for structured JSON logging
+<img width="1109" alt="Winston Logs" src="https://github.com/user-attachments/assets/86466f20-ceec-4bbe-be31-ad5d6444a915" />
+
