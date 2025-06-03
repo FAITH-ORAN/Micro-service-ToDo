@@ -22,14 +22,14 @@ const worker = new Worker(
       console.log(`👷 Worker is processing: ${title}`)
 
       return new Promise((resolve, reject) => {
-        model.insertTodo(title, (err, todo) => {
+        model.insertTodoWithRetry(title, 0, (err, todo) => {
           if (err) {
             span.setStatus({ code: 2, message: 'Insert failed' })
             span.end()
             return reject(err)
           }
 
-          console.log('✅ Todo inserted from worker:', todo)
+          console.log('✅ Todo inserted from worker (retry):', todo)
           span.setStatus({ code: 1 })
           span.end()
           resolve(todo)
