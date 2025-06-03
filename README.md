@@ -22,7 +22,7 @@ This Node.js/Express microservice manages ToDo tasks with SQLite. We demonstrate
    ```
 3. Build and start the API:
    ```bash
-   docker-compose up --build -d
+   docker-compose up --build
    ```
 
 ## Configuration Scenarios
@@ -31,7 +31,7 @@ This Node.js/Express microservice manages ToDo tasks with SQLite. We demonstrate
 
    - Comment out index creation in `src/models/todo.model.js`.
    - Remove `compression()` from `src/index.js`.
-   - Rebuild (`docker-compose up --build -d`) and run k6.
+   - Rebuild (`docker-compose up --build`) and run k6.
 
 2. **Index Only**
 
@@ -55,7 +55,7 @@ This Node.js/Express microservice manages ToDo tasks with SQLite. We demonstrate
 
 - Start containers:
   ```bash
-  docker-compose up --build -d
+  docker-compose up --build
   ```
 - Test endpoints:
   ```bash
@@ -76,22 +76,26 @@ k6 run load.test.js
 ## Performance Results
 
 1. Baseline:
-   ![alt text](<assets/img/Baseline (no index, no gzip).png>)
+   <img width="1085" alt="baseline" src="https://github.com/user-attachments/assets/243a8a9b-0dd2-4e31-99c8-1cc972327a7c" />
+
 
 2. Index Only:
-   ![alt text](<assets/img/After SQLite index.png>)
+   <img width="1205" alt="avecIndex" src="https://github.com/user-attachments/assets/7b3a358f-0785-4c68-b45e-188fd52c9277" />
+
 
 3. Gzip Only:
-   ![alt text](<assets/img/After gzip compression.png>)
+  <img width="1177" alt="GZIP" src="https://github.com/user-attachments/assets/90db9d73-3d68-4e97-8b42-a48d9c92ef24" />
+
 
 4. Index + Gzip:
-   ![alt text](<assets/img/After index + gzip.png>)
+   <img width="1184" alt="indexgzip" src="https://github.com/user-attachments/assets/32ff6550-9764-424d-8ca6-f8f16989e3eb" />
+
 
 ```
-Baseline:           p95 ≈ 4.83s
-Index Only:         p95 ≈ 30.76ms
-Gzip Only:          p95 ≈ 22.34ms
-Index + Gzip:       p95 ≈ 3.58ms
+Baseline:           p95 ≈ 3.3s
+Index Only:         p95 ≈ 2.67s
+Gzip Only:          p95 ≈ 1.52s
+Index + Gzip:       p95 ≈ 807.15ms
 ```
 
 ## Global Project Structure looks like
