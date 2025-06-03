@@ -76,16 +76,16 @@ k6 run load.test.js
 ## Performance Results
 
 1. Baseline:
-   ![alt text](<Baseline (no index, no gzip).png>)
+   ![alt text](<assets/img/Baseline (no index, no gzip).png>)
 
 2. Index Only:
-   ![alt text](<After SQLite index.png>)
+   ![alt text](<assets/img/After SQLite index.png>)
 
 3. Gzip Only:
-   ![alt text](<After gzip compression.png>)
+   ![alt text](<assets/img/After gzip compression.png>)
 
 4. Index + Gzip:
-   ![alt text](<After index + gzip.png>)
+   ![alt text](<assets/img/After index + gzip.png>)
 
 ```
 Baseline:           p95 ≈ 4.83s
