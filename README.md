@@ -91,7 +91,7 @@ k6 run load.test.js
 Baseline:           p95 ≈ 4.83s
 Index Only:         p95 ≈ 30.76ms
 Gzip Only:          p95 ≈ 22.34ms
-Index + Gzip:       p95 ≈ 3.58s
+Index + Gzip:       p95 ≈ 3.58ms
 ```
 
 ## Global Project Structure looks like
