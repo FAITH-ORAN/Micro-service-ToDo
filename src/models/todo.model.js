@@ -4,26 +4,32 @@ const dbPath = path.join(__dirname, '../../data/todos.db')
 
 // src/models/todo.model.js
 const db = require('../db/knex')
-
 async function initDB() {
-  const exists = await db.schema.hasTable('todos')
-  if (!exists) {
-    await db.schema.createTable('todos', (table) => {
-      table.increments('id').primary()
-      table.string('title')
-      table.boolean('done').defaultTo(false)
-      table.timestamps(true, true)
-    })
-    console.log('📦 Table "todos" created')
-  } else {
-    console.log('✅ Table "todos" already exists')
+  try {
+    const exists = await db.schema.hasTable('todos')
+    if (!exists) {
+      await db.schema.createTable('todos', (table) => {
+        table.increments('id').primary()
+        table.string('title')
+        table.boolean('done').defaultTo(false)
+        table.timestamps(true, true)
+      })
+      console.log('📦 Table "todos" created')
+    } else {
+      console.log('✅ Table "todos" already exists')
+    }
+
+    await db.schema.raw('CREATE INDEX IF NOT EXISTS idx_done ON todos(done)')
+    console.log('✅ Index idx_done ensured')
+  } catch (err) {
+    console.error('❌ Error during DB init:', err.message)
   }
 }
 
 function insertTodoWithRetry(title, attempt = 0, callback) {
   db('todos')
     .insert({ title })
-    .returning(['id', 'title', 'done']) // SQLite ignore "returning" mais c'est compatible PG
+    .returning(['id', 'title', 'done'])
     .then(([todo]) => {
       if (!todo) {
         // fallback pour SQLite

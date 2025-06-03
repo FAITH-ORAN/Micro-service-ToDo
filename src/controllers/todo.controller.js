@@ -8,7 +8,6 @@ async function createTodo(req, res, next) {
     const idempotencyKey = req.idempotencyKey
     const isK6Test = req.headers['x-test-k6'] === 'true'
 
-    // ↪️ Si c'est un test K6 : insérer directement sans la queue
     if (isK6Test) {
       return model.insertTodoWithRetry(title, 0, (err, todo) => {
         if (err) return next(err)

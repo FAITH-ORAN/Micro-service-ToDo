@@ -7,12 +7,14 @@ export let options = {
   duration: '30s',
   thresholds: {
     'http_req_duration{type:crud}': ['p(95)<500'],
+    'http_req_duration{type:get}': ['p(95)<500'],
   },
 }
 
 export default function () {
   const title = 'Test K6 ' + Math.random()
 
+  // POST /api/todos
   const postPayload = JSON.stringify({ title })
   const postParams = {
     headers: {
@@ -31,6 +33,15 @@ export default function () {
 
   check(postRes, {
     'POST /api/todos returns 201': (r) => r.status === 201,
+  })
+
+  // GET /api/todos
+  const getRes = http.get('http://localhost:3000/api/todos', {
+    tags: { type: 'get' },
+  })
+
+  check(getRes, {
+    'GET /api/todos returns 200': (r) => r.status === 200,
   })
 
   sleep(1)
