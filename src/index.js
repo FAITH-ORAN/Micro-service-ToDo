@@ -6,7 +6,7 @@ const rateLimiter = require('./middleware/rateLimiter')
 const { initDB } = require('./models/todo.model')
 const todosRouter = require('./routes/todos')
 const { metricsMiddleware, register } = require('./middleware/metrics')
-const compression = require('compression')
+const compressionMiddleware = require('./middleware/compression');
 
 dotenv.config()
 const app = express()
@@ -16,12 +16,7 @@ initTelemetry()
 
 initDB()
 
-app.use(
-  compression({
-    threshold: 0, // compress every JSON response, no matter how small
-  })
-)
-
+app.use(compressionMiddleware);
 app.use(express.json())
 app.use(rateLimiter)
 app.use(metricsMiddleware)
