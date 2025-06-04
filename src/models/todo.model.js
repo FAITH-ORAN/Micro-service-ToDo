@@ -52,7 +52,6 @@ function insertTodoWithRetry(title, completed = false, attempt = 0, callback) {
 
 function getTodos(callback) {
   db('todos')
-    .where({ done: 0 })
     .orderBy('id', 'desc')
     .then((rows) => callback(null, rows))
     .catch((err) => callback(err))
