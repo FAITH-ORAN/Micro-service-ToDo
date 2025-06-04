@@ -1,7 +1,6 @@
 const redisClient = require('../redis')
 const todoQueue = require('../../queue/queue')
 const model = require('../models/todo.model')
-const logger = require('../logger');
 
 async function createTodo(req, res, next) {
   try {
@@ -32,7 +31,7 @@ async function createTodo(req, res, next) {
 
     return res.status(202).json(tempResponse)
   } catch (error) {
-    logger.error({ msg: 'Error creating todo', error: error.stack });
+    console.error('Error creating todo:', error)
     next(error)
   }
 }
@@ -40,7 +39,7 @@ async function createTodo(req, res, next) {
 function getAllTodos(req, res, next) {
   model.getTodos((err, todos) => {
     if (err) {
-      logger.error({ msg: 'Error fetching todos', error: err.message });
+      console.error('Error fetching todos:', err)
       return next(err)
     }
     res.status(200).json(todos)
@@ -53,7 +52,7 @@ function updateTodo(req, res, next) {
 
   model.updateTodo(id, completed, (err, changes) => {
     if (err) {
-      logger.error({ msg: 'Error updating todo', error: err.message });
+      console.error('Error updating todo:', err)
       return next(err)
     }
     if (changes === 0) {
