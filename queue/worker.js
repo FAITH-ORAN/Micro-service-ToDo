@@ -4,6 +4,7 @@ const model = require('../src/models/todo.model')
 const { trace, context } = require('@opentelemetry/api')
 
 const tracer = trace.getTracer('todo-worker')
+const logger = require('../src/logger');
 
 const worker = new Worker(
   'todoQueue',
@@ -20,7 +21,11 @@ const worker = new Worker(
     })
 
     return context.with(trace.setSpan(context.active(), span), () => {
-      console.log(`👷 Worker is processing: ${title} (completed: ${completed})`)
+      logger.info({
+        msg: 'Worker processing job',
+        jobId: job.id,
+        title,
+      });
 
       return new Promise((resolve, reject) => {
         model.insertTodoWithRetry(title, completed, 0, (err, todo) => {
@@ -28,10 +33,20 @@ const worker = new Worker(
             console.error('❌ Worker failed to insert todo:', err.message)
             span.setStatus({ code: 2, message: 'Insert failed' })
             span.end()
+            logger.error({
+              msg: 'Failed to insert todo in worker',
+              jobId: job.id,
+              error: err.message,
+            });
             return reject(err)
           }
 
-          console.log('✅ Todo inserted from worker (retry):', todo)
+          logger.info({
+            msg: 'Todo inserted from worker (retry)',
+            jobId: job.id,
+            todoId: todo.id,
+          });
+
           span.setStatus({ code: 1 })
           span.end()
           resolve(todo)
@@ -43,9 +58,16 @@ const worker = new Worker(
 )
 
 worker.on('completed', (job) => {
-  console.log(`🎉 Job ${job.id} completed`)
+  logger.info({
+    msg: 'Worker job completed',
+    jobId: job.id,
+  });
 })
 
 worker.on('failed', (job, err) => {
-  console.error(`❌ Job ${job?.id} failed:`, err?.message)
+  logger.error({
+    msg: 'Worker job failed',
+    jobId: job.id,
+    error: err.message || err.stack,
+  });
 })
