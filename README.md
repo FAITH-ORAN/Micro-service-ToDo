@@ -25,6 +25,75 @@ This Node.js/Express microservice manages ToDo tasks with SQLite. We demonstrate
    docker-compose up --build
    ```
 
+## Ports & Endpoints
+
+When you run the stack (e.g. via Docker Compose), the following services will be available on these ports:
+
+- **ToDo API (todo-api)**  
+  - Host: `localhost:3000` → Container: `3000`  
+  - All CRUD endpoints (e.g. `POST /api/todos`, `GET /api/todos`, `PATCH /api/todos/:id`) are served here.
+
+- **Worker (todo‐api worker)**  
+  - This container does not expose any external ports; it listens on the internal Redis queue and processes jobs.
+
+- **Redis (redis)**  
+  - Host: `localhost:6379` → Container: `6379`  
+  - Used for idempotency key storage, caching, and BullMQ job queue.
+
+- **Jaeger UI (jaeger-1)**  
+  - Host: `localhost:16686` → Container: `16686`  
+  - Traces sent via OpenTelemetry OTLP exporter can be viewed here (e.g. spans for incoming HTTP requests).
+
+- **Jaeger OTLP (otlp collector)  
+  - Host: `localhost:4318` → Container: `4318`  
+  - OTLP HTTP/GRPC endpoint that the Node.js service exports traces to (configured in `otel.js`).
+
+- **Prometheus (prometheus-1)**  
+  - Host: `localhost:9090` → Container: `9090`  
+  - Scrapes `/metrics` from the Node.js service and any other instrumented targets.
+
+- **Grafana (grafana-1)**  
+  - Host: `localhost:3001` → Container: `3000`  
+  - Connect to Prometheus (`http://prometheus:9090`) as a data source and build dashboards (e.g. HTTP p95 latency, error rates).
+
+### Example Usage
+
+1. **API calls**  
+   - Create a new ToDo:  
+     ```bash
+     curl -X POST http://localhost:3000/api/todos \
+       -H "Content-Type: application/json" \
+       -H "X-Idempotency-Key: your-unique-key" \
+       -d '{"title":"Buy milk"}'
+     ```
+   - List all ToDos:  
+     ```bash
+     curl http://localhost:3000/api/todos
+     ```
+
+2. **View Traces in Jaeger**  
+   - Open your browser to:  
+     ```
+     http://localhost:16686
+     ```
+   - Select service name `todo-api` to inspect incoming HTTP‐span details.
+
+3. **View Metrics in Prometheus**  
+   - Open your browser to:  
+     ```
+     http://localhost:9090
+     ```
+   - Use the “Metrics” search bar to query e.g. `http_request_duration_ms` or any custom metrics.
+
+4. **View Dashboards in Grafana**  
+   - Open your browser to:  
+     ```
+     http://localhost:3001
+     ```
+   - Log in (default: admin/admin) and add Prometheus (`http://prometheus:9090`) as a data source.  
+   - Import or create dashboards to visualize API p95/p99 latency, error rates, Redis queue length, etc.
+
+
 ## Configuration Scenarios
 
 1. **Baseline (No Index, No Gzip)**
