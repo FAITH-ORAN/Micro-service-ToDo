@@ -5,6 +5,7 @@ const {
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http')
 const { resourceFromAttributes } = require('@opentelemetry/resources')
 const { ATTR_SERVICE_NAME } = require('@opentelemetry/semantic-conventions')
+const logger = require('../logger');
 
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
@@ -19,9 +20,15 @@ const sdk = new NodeSDK({
 async function initTelemetry() {
   try {
     await sdk.start()
-    console.log('✅ OpenTelemetry initialized')
+    logger.info({
+      msg: '✅ OpenTelemetry initialized',
+      service: 'todo-api',
+    });
   } catch (err) {
-    console.error('❌ Error initializing OpenTelemetry', err)
+    logger.error({
+      msg: '❌ Error initializing OpenTelemetry',
+      error: err.message,
+    });
   }
 }
 
