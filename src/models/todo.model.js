@@ -15,15 +15,15 @@ async function initDB() {
         table.boolean('done').defaultTo(false)
         table.timestamps(true, true)
       })
-      console.log('📦 Table "todos" created')
+      logger.info({ msg: '📦 Table "todos" created' })
     } else {
-      console.log('✅ Table "todos" already exists')
+      logger.info({ msg: '✅ Table "todos" already exists' })
     }
 
     await db.schema.raw('CREATE INDEX IF NOT EXISTS idx_done ON todos(done)')
-    console.log('✅ Index idx_done ensured')
+    logger.info({ msg: '✅ Index idx_done ensured' })
   } catch (err) {
-    console.error('❌ Error during DB init:', err.message)
+    logger.error({ msg: '❌ Error during DB init', error: err.message })
   }
 }
 
@@ -42,11 +42,13 @@ function insertTodoWithRetry(title, completed = false, attempt = 0, callback) {
     })
     .catch((err) => {
       if (err.message.includes('SQLITE_BUSY') && attempt < 5) {
+        logger.warn({ msg: `Attempt ${attempt} failed, retrying INSERT`, error: err.message })
         return setTimeout(
           () => insertTodoWithRetry(title, completed, attempt + 1, callback),
           50
         )
       }
+      logger.error({ msg: '❌ Insert failed after retries', error: err.message })
       return callback(err)
     })
 }
@@ -55,7 +57,10 @@ function getTodos(callback) {
   db('todos')
     .orderBy('id', 'desc')
     .then((rows) => callback(null, rows))
-    .catch((err) => callback(err))
+    .catch((err) => {
+      logger.error({ msg: 'Error fetching todos', error: err.message })
+      callback(err)
+    })
 }
 
 function updateTodo(id, completed, callback) {
@@ -63,7 +68,10 @@ function updateTodo(id, completed, callback) {
     .where({ id })
     .update({ done: completed ? 1 : 0 })
     .then((count) => callback(null, count))
-    .catch((err) => callback(err))
+    .catch((err) => {
+      logger.error({ msg: 'Error updating todo', error: err.message })
+      callback(err)
+    })
 }
 
 module.exports = {
