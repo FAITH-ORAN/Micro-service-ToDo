@@ -1,6 +1,6 @@
-# ToDo API Performance Optimizations
+# ToDo API Performance Optimizations - Microservices
 
-This Node.js/Express microservice manages ToDo tasks with SQLite. We demonstrate performance gains by adding a database index and enabling HTTP gzip compression, validated via k6 load tests.
+This Node.js/Express microservice manages ToDo tasks with SQLite. 
 
 ## Prerequisites
 
@@ -92,8 +92,10 @@ When you run the stack (e.g. via Docker Compose), the following services will be
      ```
    - Log in (default: admin/admin) and add Prometheus (`http://prometheus:9090`) as a data source.  
    - Import or create dashboards to visualize API p95/p99 latency, error rates, Redis queue length, etc.
-
-
+  
+   
+# Performance Optimizations 
+# Now we demonstrate performance gains by adding a database index and enabling HTTP gzip compression, validated via k6 load tests.
 ## Configuration Scenarios
 
 1. **Baseline (No Index, No Gzip)**
