@@ -4,22 +4,23 @@ const model = require('../models/todo.model')
 
 async function createTodo(req, res, next) {
   try {
-    const { title } = req.body
+    const { title, completed = false } = req.body
     const idempotencyKey = req.idempotencyKey
     const isK6Test = req.headers['x-test-k6'] === 'true'
 
     if (isK6Test) {
-      return model.insertTodoWithRetry(title, 0, (err, todo) => {
+      return model.insertTodoWithRetry(title, completed, 0, (err, todo) => {
         if (err) return next(err)
         return res.status(201).json(todo)
       })
     }
+
     const cached = await redisClient.get(`idem:${idempotencyKey}`)
     if (cached) {
       return res.status(200).json(JSON.parse(cached))
     }
 
-    const job = await todoQueue.add('createTodo', { title })
+    const job = await todoQueue.add('createTodo', { title, completed })
     const tempResponse = { jobId: job.id, status: 'queued' }
 
     await redisClient.set(
