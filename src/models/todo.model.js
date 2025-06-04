@@ -26,13 +26,12 @@ async function initDB() {
   }
 }
 
-function insertTodoWithRetry(title, attempt = 0, callback) {
+function insertTodoWithRetry(title, completed = false, attempt = 0, callback) {
   db('todos')
-    .insert({ title })
+    .insert({ title, done: completed ? 1 : 0 })
     .returning(['id', 'title', 'done'])
     .then(([todo]) => {
       if (!todo) {
-        // fallback pour SQLite
         return db('todos')
           .orderBy('id', 'desc')
           .first()
@@ -43,7 +42,7 @@ function insertTodoWithRetry(title, attempt = 0, callback) {
     .catch((err) => {
       if (err.message.includes('SQLITE_BUSY') && attempt < 5) {
         return setTimeout(
-          () => insertTodoWithRetry(title, attempt + 1, callback),
+          () => insertTodoWithRetry(title, completed, attempt + 1, callback),
           50
         )
       }
